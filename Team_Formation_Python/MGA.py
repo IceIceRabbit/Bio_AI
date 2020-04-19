@@ -1,10 +1,10 @@
 #the GA
 
-###########################################  PACKAGES      ##########################################################################
 import math
 import random
 import numpy as np
 import time
+#import brain
 
 
 
@@ -20,7 +20,7 @@ class GA:
         self.fitz = []                                      #list of fitnesses of the individuals
         self.Rp = 0                                         #parent
         self.M_now = [0, 1, 2, 3, 4]                        #stop, up, down, right, left action population
-        
+        self.fin_act = 0
     """
     Arguments in functions
     Tot = list of total population
@@ -31,48 +31,73 @@ class GA:
     acti = action to take
     """
 
-    def funktion(self, m):                                                          #arg: individual from the population
-        return ("call brain function")                                              #returns the function value for that argument
-
 
     def nearz(self, q, arr):                                                        #calculates the nearest element in the array (arr) to the number q
-        arr = abs(arr-q)
-        minz = np.amin(arr)
+        minz = np.amax(arr)
         arr = arr.tolist()
         return arr.index(minz)
 
 
 
 
-    def fitness(self, Tot, t, fit):
-        for j in range (0,t):                                                 #array of fitnesss of all individuals
-            fit.append(self.funktion(float(Tot[j])))
+    def fitness(self, fit):
+         fit.append(0)
+         fit.append(-1)
+         fit.append(-1)
+         fit.append(-1)
+         fit.append(5)
+#        fit = brain.surrounding_rewards()                                          #array of fitnesss of all individuals GET FROM BRAIN
 
 
 
-    def selection(self, Tot, fit, Par):                                       #select BEST, aka direction with highest fitness
+    def delete_walls(self): 
+        for i in range(len(self.M_now)-1, 0, -1):
+            if self.fitz[i] == -1:
+                del self.fitz[i]
+                del self.M_now[i]
+
+            
+
+
+    def selection(self, Tot, fit):                                       #select BEST, aka direction with highest fitness
         maxi = self.nearz(50,np.array(fit))
-        Par = Tot[mini]
+        self.Rp = Tot[maxi]
 
 
 
-    def clutate(self, acti, Pc):                                              #clone OR mutate
+    def clutate(self):                                                        #clone OR mutate
         
         rand0 = random.random()                                               #select random number between 0-1 to compare to crossover/cloning probability
-        if rand0 > self.Pc:
-            acti = rand1
+        if rand0 < self.Pc:
+            print("Cloned")
+            self.fin_act = self.M_now.index(self.Rp)
         else:                                                                 #else mutate
-            acti = random.randrange(0,5)
+            self.fin_act = random.randrange(0,len(self.M_now)-1)
+            print("Mutated")
 
 
 
-    def run():
-            self.fitness(self.M_now, self.m, self.fitz)
+    def get_action(self):
+        self.fitness(self.fitz)
+        print("[stay(0), up(1), down(2), right(3), left(4)]")
+        self.delete_walls()
+        print("Fitnesses: " + str(self.fitz))
+        print("Actions: " + str(self.M_now))
+        self.selection(self.M_now, self.fitz)
+        self.clutate()
+        return self.fin_act
 
-            self.selection(self.M_now, self.fitz, self.Rp)
 
-            self.clutate(fin_act, self.Pc)
-            print(fin_act)
-            return fin_act
-
-
+if True:
+    gee = GA(0.5)
+    flee = gee.get_action()
+    if gee.M_now[flee] == 0:
+        print("stay")
+    elif gee.M_now[flee] == 1:
+        print("up")
+    elif gee.M_now[flee] == 2:
+        print("down")
+    elif gee.M_now[flee] == 3:
+        print("right")
+    elif gee.M_now[flee] == 4:
+        print("left")
