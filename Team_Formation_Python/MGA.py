@@ -88,7 +88,7 @@ class GA:
         return self.fin_act
 
 
-for x in range(30):                                                           #run for 30 GENS
+if True:
     gee = GA(0.5)
     flee = gee.get_action()
     if gee.M_now[flee] == 0:
