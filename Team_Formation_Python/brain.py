@@ -6,10 +6,20 @@ class Brain:
         self.team_size = team_size
         self.actions = actions
 
+    def surrounding_rewards(self, state):
+        x = state[0] #state[0] = x, state[1] = y
+        y = state[1]
+        here = y + self.grid_length*x
+        up = y + self.grid_length*(x+1)
+        down = y + self.grid_length*(x-1)
+        right = (y+1) + self.grid_length*x
+        left = (y-1) + self.grid_length*x
+        fitness = [self.grid_reward(here), self.grid_reward(up), self.grid_reward(down), self.grid_reward(right), self.grid_reward(left)]
+        return fitness
+        
     def get_action(self,state,fitness):
-        fitness =
-        action = MGA.get_action(fitness)
 
+        action = MGA.get_action(fitness)
 
 
 
