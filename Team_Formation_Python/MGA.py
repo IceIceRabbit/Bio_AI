@@ -4,8 +4,8 @@ import math
 import random
 import numpy as np
 import time
-#import brain
-
+import brain
+import world
 
 
 class GA:
@@ -18,8 +18,9 @@ class GA:
         self.Pm = 1-Pc                                      #probability of mutation
 
         self.fitz = []                                      #list of fitnesses of the individuals
+        #self.fitz = brain.surrounding_rewards()
         self.Rp = 0                                         #parent
-        self.M_now = [0, 1, 2, 3, 4]                        #stop, up, down, right, left action population
+        self.M_now = world.action()                         #stop, up, down, right, left action population
         self.fin_act = 0
     """
     Arguments in functions
@@ -40,13 +41,13 @@ class GA:
 
 
 
-    def fitness(self, fit):
+    def fitness(self, fit):                                                         #CODE TESTING ONLY
          fit.append(0)
          fit.append(-1)
          fit.append(-1)
          fit.append(-1)
          fit.append(5)
-#        fit = brain.surrounding_rewards()                                          #array of fitnesss of all individuals GET FROM BRAIN
+ #        fit = brain.surrounding_rewards()                                          #array of fitnesss of all individuals GET FROM BRAIN
 
 
 
@@ -80,7 +81,6 @@ class GA:
     def get_action(self):
         self.fitness(self.fitz)
         print("[stay(0), up(1), down(2), right(3), left(4)]")
-        self.delete_walls()
         print("Fitnesses: " + str(self.fitz))
         print("Actions: " + str(self.M_now))
         self.selection(self.M_now, self.fitz)
@@ -88,7 +88,7 @@ class GA:
         return self.fin_act
 
 
-if True:
+for x in range(30):                                                           #run for 30 GENS
     gee = GA(0.5)
     flee = gee.get_action()
     if gee.M_now[flee] == 0:
