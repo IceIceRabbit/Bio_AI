@@ -13,8 +13,8 @@ class World:
         self.no_of_teams = 4
         self.pop = self.team_size * self.no_of_teams
         self.agent_states = [-1 for x in range(self.pop)]
-        self.actions = {'up': (-1 * self.grid_x), 'left': (-1), 'right': (+1), 'down': (+1 * self.grid_x)}
-        self.agent_brain = brain.Brain(self.grid_length,self.team_size,self.actions)
+        self.actions = {'up': (-1 * self.grid_x), 'left': (-1), 'right': (+1), 'down': (+1 * self.grid_x)}         
+        self.agents = [brain.Brain(self.grid_length,self.team_size,self.actions) for x in range(self.pop)]
 
     def initialize_grid(self):
         for i in range(self.grid_y):
