@@ -6,9 +6,9 @@ class Brain:
         self.team_size = team_size
         self.actions = actions
         
-    def get_action(self,state,fitness):
+    def get_action(self,state):
 
-        action = MGA.get_action(fitness)
+        action = MGA.get_action(state)
 
 
 
