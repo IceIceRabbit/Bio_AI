@@ -32,19 +32,5 @@ class World:
 
     def update_step(self):
         for i in range(self.pop):
-            act = brain.get_action(type='policy')
-            self.action(i, act)
+            act = brain.get_action(i)
 
-    def action(self, agent, act):
-        action_check = self.actions[act]
-        fut_state = self.agent_states[agent] + self.actions[act]
-        if action_check == 1 or -1:
-            if action_check == 1 and fut_state % self.grid_x == 0:
-                new_sample_act = brain.get_action(type='random')
-                return self.action(agent, new_sample_act)
-            elif action_check == -1 and fut_state % self.grid_y == self.grid_x - 1:
-                new_sample_act = brain.get_action(type='random')
-                return self.action(agent, new_sample_act)
-        elif fut_state > 0 or fut_state < self.grid_length:
-            new_sample_act = brain.get_action(type='random')
-            return self.action(agent, new_sample_act)
