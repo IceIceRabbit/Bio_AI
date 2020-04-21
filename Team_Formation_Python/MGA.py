@@ -10,59 +10,56 @@ import world
 
 class GA:
 
-    def __init__(self, Pc):
+    def __init__(self):
 
         self.r = 1                                          #number of parents
         self.m = 5                                          #number of individuals/actions
-        self.Pc = Pc                                        #probability of crossover
-        self.Pm = 1-Pc                                      #probability of mutation
+        self.Pc = 0                                        #probability of crossover
 
         self.fitz = []                                      #list of fitnesses of the individuals
-        #self.fitz = brain.surrounding_rewards()
         self.Rp = 0                                         #parent
-        self.M_now = world.action()                         #stop, up, down, right, left action population
+        self.M_now = ["stay", "up", "down", "right", "left"]                        #stop, up, down, right, left action population
         self.fin_act = 0
-    """
-    Arguments in functions
-    Tot = list of total population
-    Par = list of parents
-    t = number of individuals in the population
-    p = number of parents
-    ps = list of probability of selection of individuals in the population
-    acti = action to take
-    """
 
 
-    def nearz(self, q, arr):                                                        #calculates the nearest element in the array (arr) to the number q
-        minz = np.amax(arr)
-        arr = arr.tolist()
-        return arr.index(minz)
+    def fitness(self, state):
+        here = state
+        up = state - world.grid_length
+        down = state + world.grid_length
+        right = state + 1
+        left = state - 1
+        fitness = [world.grid_reward(here), world.grid_reward(up),
+                   world.grid_reward(down), world.grid_reward(right),
+                   world.grid_reward(left)]
+        self.fitz = fitness
+
+        
 
 
+    def delete_walls(self, agent):
+        
+        for i in range(len(self.M_now)-1, 1, -1):
+            act = M_now[i]
+            action_check = world.actions[act]
+            fut_state = world.agent_states[agent] + world.actions[act]
+            if action_check == 1 or -1:
+                if action_check == 1 and fut_state % world.grid_x == 0:
+                    del self.fitz[i]
+                    del self.M_now[i]
+                elif action_check == -1 and fut_state % world.grid_y == world.grid_x - 1:
+                    del self.fitz[i]
+                    del self.M_now[i]
+            elif fut_state > 0 or fut_state < world.grid_length:
+                    del self.fitz[i]
+                    del self.M_now[i]
 
 
-    def fitness(self, fit):                                                         #CODE TESTING ONLY
-         fit.append(0)
-         fit.append(-1)
-         fit.append(-1)
-         fit.append(-1)
-         fit.append(5)
- #        fit = brain.surrounding_rewards()                                          #array of fitnesss of all individuals GET FROM BRAIN
-
-
-
-    def delete_walls(self): 
-        for i in range(len(self.M_now)-1, 0, -1):
-            if self.fitz[i] == -1:
-                del self.fitz[i]
-                del self.M_now[i]
-
-            
-
-
-    def selection(self, Tot, fit):                                       #select BEST, aka direction with highest fitness
-        maxi = self.nearz(50,np.array(fit))
-        self.Rp = Tot[maxi]
+    def selection(self):                                                      #select BEST, aka direction with highest fitness
+        
+        maxi = np.amax(np.array(self.fitz))
+        self.fitz = self.fitz.tolist()
+        maxi = self.fitz.tolist()
+        self.Rp = self.M_now[self.fitz.index(maxi)]
 
 
 
@@ -78,26 +75,15 @@ class GA:
 
 
 
-    def get_action(self):
-        self.fitness(self.fitz)
-        print("[stay(0), up(1), down(2), right(3), left(4)]")
+    def get_action(self, Pc, state):
+
+        self.fitness(state)
+        self.Pc = Pc
+        self.delete_walls(state)
         print("Fitnesses: " + str(self.fitz))
         print("Actions: " + str(self.M_now))
-        self.selection(self.M_now, self.fitz)
+        self.selection()
         self.clutate()
         return self.fin_act
 
 
-if True:
-    gee = GA(0.5)
-    flee = gee.get_action()
-    if gee.M_now[flee] == 0:
-        print("stay")
-    elif gee.M_now[flee] == 1:
-        print("up")
-    elif gee.M_now[flee] == 2:
-        print("down")
-    elif gee.M_now[flee] == 3:
-        print("right")
-    elif gee.M_now[flee] == 4:
-        print("left")
