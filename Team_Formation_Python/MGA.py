@@ -28,7 +28,7 @@ class GA:
         down = state + world.grid_length
         right = state + 1
         left = state - 1
-        fitness = [world.grid_reward(here), world.grid_reward(up),
+        fitness = [.grid_reward(here), world.grid_reward(up),
                    world.grid_reward(down), world.grid_reward(right),
                    world.grid_reward(left)]
         self.fitz = fitness
@@ -57,8 +57,7 @@ class GA:
     def selection(self):                                                      #select BEST, aka direction with highest fitness
         
         maxi = np.amax(np.array(self.fitz))
-        self.fitz = self.fitz.tolist()
-        maxi = self.fitz.tolist()
+        self.fitz = maxi.tolist()
         self.Rp = self.M_now[self.fitz.index(maxi)]
 
 
