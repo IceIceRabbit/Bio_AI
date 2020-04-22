@@ -46,17 +46,17 @@ class World:
 
 
 
-    if __name__ == "__main__":
-        print("Training")
-        world = World()
-        world.initialize_grid()
-        world.populate_world()
-        episodes = 10
-        episode_length = 100
-        for j in range(episodes):
-            for i in range(episode_length):
-                print(self.grid_dict)
-                world.update_step()
+if __name__ == "__main__":
+    print("Training")
+    world = World()
+    world.initialize_grid()
+    world.populate_world()
+    episodes = 10
+    episode_length = 100
+    for j in range(episodes):
+        for i in range(episode_length):
+            print(self.grid_dict)
+            world.update_step()
 
 
 
