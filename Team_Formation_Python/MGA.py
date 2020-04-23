@@ -1,63 +1,62 @@
-#the GA
-
+import sys
+sys.path.insert(0, r'C:\Users\manas\Documents\Codes\BioAI\Final')
 import math
 import random
 import numpy as np
 import time
-import brain
-import world
 
 
-class GA:
 
-    def __init__(self):
+class MGA:
+
+    def __init__(self, grid_length, grid_reward, actions, agent_states, grid_x, grid_y):
 
         self.r = 1                                          #number of parents
         self.m = 5                                          #number of individuals/actions
-        self.Pc = 0                                        #probability of crossover
+        self.Pc = 0                                         #probability of crossover
 
         self.fitz = []                                      #list of fitnesses of the individuals
         self.Rp = 0                                         #parent
-        self.M_now = ["stay", "up", "down", "right", "left"]                        #stop, up, down, right, left action population
+        self.M_now = ["up", "down", "right", "left"]                        #stop, up, down, right, left action population
         self.fin_act = 0
+        self.grid_length = grid_length
+        self.grid_reward = grid_reward
+        self.actions = actions
+        self.agent_states = agent_states
+        self.grid_x = grid_x
+        self.grid_y = grid_y
 
 
-    def fitness(self, state):
-        here = state
-        up = state - world.grid_length
-        down = state + world.grid_length
-        right = state + 1
-        left = state - 1
-        fitness = [.grid_reward(here), world.grid_reward(up),
-                   world.grid_reward(down), world.grid_reward(right),
-                   world.grid_reward(left)]
-        self.fitz = fitness
+    def fitness(self, tot, state):
+        fit = []
+        for j in range(len(tot)):
+            i = tot[j]
+            fit.append(self.grid_reward[state + self.actions[i]])
+            print(fit)
+        self.fitz = fit
+        
 
         
 
 
     def delete_walls(self, agent):
         
-        for i in range(len(self.M_now)-1, 1, -1):
-            act = M_now[i]
-            action_check = world.actions[act]
-            fut_state = world.agent_states[agent] + world.actions[act]
-            if action_check == 1 or -1:
-                if action_check == 1 and fut_state % world.grid_x == 0:
-                    del self.fitz[i]
+        for i in range(len(self.M_now)-1, -1, -1):
+            act = self.M_now[i]
+            action_check = self.actions[act]
+            fut_state = agent + self.actions[act]
+            if action_check == 1 or action_check == -1:
+                if action_check == 1 and fut_state % self.grid_x == 0:
                     del self.M_now[i]
-                elif action_check == -1 and fut_state % world.grid_y == world.grid_x - 1:
-                    del self.fitz[i]
+                elif action_check == -1 and fut_state % self.grid_y == self.grid_x - 1:
                     del self.M_now[i]
-            elif fut_state > 0 or fut_state < world.grid_length:
-                    del self.fitz[i]
+            elif fut_state < 0 or fut_state >= self.grid_length:
                     del self.M_now[i]
 
 
     def selection(self):                                                      #select BEST, aka direction with highest fitness
         
         maxi = np.amax(np.array(self.fitz))
-        self.fitz = maxi.tolist()
         self.Rp = self.M_now[self.fitz.index(maxi)]
 
 
@@ -66,23 +65,20 @@ class GA:
         
         rand0 = random.random()                                               #select random number between 0-1 to compare to crossover/cloning probability
         if rand0 < self.Pc:
-            print("Cloned")
+            #print("Cloned")
             self.fin_act = self.M_now.index(self.Rp)
         else:                                                                 #else mutate
             self.fin_act = random.randrange(0,len(self.M_now)-1)
-            print("Mutated")
+            #print("Mutated")
 
 
 
-    def get_action(self, Pc, state):
+    def move(self, Pc, state):
 
-        self.fitness(state)
+        
         self.Pc = Pc
         self.delete_walls(state)
-        print("Fitnesses: " + str(self.fitz))
-        print("Actions: " + str(self.M_now))
+        self.fitness(self.M_now, state)
         self.selection()
         self.clutate()
-        return self.fin_act
-
-
+        return self.M_now[self.fin_act]
