@@ -4,12 +4,13 @@ import math
 import random
 import numpy as np
 import time
+import copy
 
 
 
 class MGA:
 
-    def __init__(self, grid_length, grid_reward, actions, agent_states, grid_x, grid_y):
+    def __init__(self,grid_dict, grid_length, grid_reward, actions, agent_states, grid_x, grid_y,team_size):
 
         self.r = 1                                          #number of parents
         self.m = 5                                          #number of individuals/actions
@@ -17,12 +18,15 @@ class MGA:
 
         self.fitz = []                                      #list of fitnesses of the individuals
         self.Rp = 0                                         #parent
-        self.M_now = ["up", "down", "right", "left"]                        #stop, up, down, right, left action population
+        self.M_now = ["up", "down", "right", "left","stay"
+                      ]                        #stop, up, down, right, left action population
         self.fin_act = 0
+        self.grid_dict = grid_dict
         self.grid_length = grid_length
         self.grid_reward = grid_reward
         self.actions = actions
         self.agent_states = agent_states
+        self.team_size = team_size
         self.grid_x = grid_x
         self.grid_y = grid_y
 
@@ -40,35 +44,41 @@ class MGA:
 
 
     def delete_walls(self, agent):
-        
+        possible_states = copy.copy(self.M_now)
+        # print(self.M_now)
         for i in range(len(self.M_now)-1, -1, -1):
-            act = self.M_now[i]
+            act = possible_states[i]
             action_check = self.actions[act]
             fut_state = agent + self.actions[act]
             if action_check == 1 or action_check == -1:
                 if action_check == 1 and fut_state % self.grid_x == 0:
-                    del self.M_now[i]
+                    del possible_states[i]
                 elif action_check == -1 and fut_state % self.grid_y == self.grid_x - 1:
-                    del self.M_now[i]
+                    del possible_states[i]
             elif fut_state < 0 or fut_state >= self.grid_length:
-                    del self.M_now[i]
+                    del possible_states[i]
+            elif len(self.grid_dict.get(fut_state)) >= self.team_size:
+                del possible_states[i]
+
+        return possible_states
 
 
-    def selection(self):                                                      #select BEST, aka direction with highest fitness
+    def selection(self,actions):                                                      #select BEST, aka direction with highest fitness
         
         maxi = np.amax(np.array(self.fitz))
-        self.Rp = self.M_now[self.fitz.index(maxi)]
+        self.Rp = actions[self.fitz.index(maxi)]
 
 
 
-    def clutate(self):                                                        #clone OR mutate
+    def clutate(self,possible_acts):                                                        #clone OR mutate
         
         rand0 = random.random()                                               #select random number between 0-1 to compare to crossover/cloning probability
+        # print(self.M_now)
         if rand0 < self.Pc:
             #print("Cloned")
-            self.fin_act = self.M_now.index(self.Rp)
+            self.fin_act = possible_acts.index(self.Rp)
         else:                                                                 #else mutate
-            self.fin_act = random.randrange(0,len(self.M_now)-1)
+            self.fin_act = random.randint(0,len(possible_acts) - 1)
             #print("Mutated")
 
 
@@ -77,8 +87,8 @@ class MGA:
 
         
         self.Pc = Pc
-        self.delete_walls(state)
-        self.fitness(self.M_now, state)
-        self.selection()
-        self.clutate()
-        return self.M_now[self.fin_act]
+        pos_actions = self.delete_walls(state)
+        self.fitness(pos_actions, state)
+        self.selection(pos_actions)
+        self.clutate(pos_actions)
+        return pos_actions[self.fin_act]
