@@ -8,12 +8,12 @@ import matplotlib.pyplot as plt
 
 class world:
     def __init__(self):
-        self.grid_x = 3
-        self.grid_y = 3
+        self.grid_x = 7
+        self.grid_y = 7
         self.grid_length = self.grid_x * self.grid_y
         self.grid_dict = {}
         self.team_size = 3
-        self.no_of_teams = 3
+        self.no_of_teams = 10
         self.pop = self.team_size * self.no_of_teams
         self.agent_states = [-1 for x in range(self.pop)]
         self.actions = {'up': (-1 * self.grid_x), 'left': (-1), 'right': (+1), 'down': (+1 * self.grid_x) ,'stay':(0)}
@@ -56,9 +56,20 @@ class world:
             #     self.step(self.grid_dict,i)
 
 
+    def check_reward(self):
+        r = 0
+        for i in self.grid_dict.values():
+            if len(i) == self.team_size:
+                r = r+1
+        if r >= self.no_of_teams/2 -1:
+            return True
+        else:
+            return False
+
 
     def view_grid(self,epi):
-         
+        
+        fig.clf()
         color = ['b','g','r','c','m','y','k','w']
         plt.xlim([0,self.grid_x])
         plt.ylim([0,self.grid_y])
@@ -75,20 +86,21 @@ class world:
                 plt.scatter(x, y)
                 x = x + 0.1
         fig.canvas.draw()
+        
+
 
 if __name__ == "__main__":
     print("Training")
     world = world()
     world.initialize_grid()
     world.populate_world()
-    episodes = 1000
-    episode_length = 10
+    episodes = 100
+    episode_length = 100
 
     fig = plt.gcf()
     fig = plt.figure()
     fig.show()
     fig.canvas.draw()
-    fig.clf()
         
     for j in range(episodes):
         world.initialize_grid()
@@ -98,7 +110,15 @@ if __name__ == "__main__":
             print("epi - " + str(j))
             print("step - " + str(i))
             world.update_step()
-        world.view_grid(j)
-        time.sleep(2)
+            world.view_grid(i)
+            if world.check_reward():
+                filename = 'best_plot' + str(i) + '.png'
+                fig = plt.gcf()
+                plt.savefig(filename)
+                print()
+                print("One of the best!")
+                print()
+                time.sleep(3)
+        time.sleep(5)
         fig.clf()
         
