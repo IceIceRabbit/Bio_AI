@@ -3,12 +3,13 @@ sys.path.insert(0, r'C:\Users\manas\Documents\Codes\BioAI\Final')
 import numpy as np
 import random
 import brain
-
+import time
+import matplotlib.pyplot as plt
 
 class world:
     def __init__(self):
-        self.grid_x = 2
-        self.grid_y = 2
+        self.grid_x = 3
+        self.grid_y = 3
         self.grid_length = self.grid_x * self.grid_y
         self.grid_dict = {}
         self.team_size = 3
@@ -56,11 +57,24 @@ class world:
 
 
 
-# def view_grid(grid,x,y):
-#     for i in range(x):
-#         for j in range(y):
-#             print(grid[i*x + j])
-
+    def view_grid(self,epi):
+         
+        color = ['b','g','r','c','m','y','k','w']
+        plt.xlim([0,self.grid_x])
+        plt.ylim([0,self.grid_y])
+        plt.xticks(range(0, self.grid_x))
+        plt.yticks(range(0, self.grid_y))
+        plt.rc('grid', linestyle="-")
+        plt.grid(True)
+        plt.title('Episode: '+ str(epi))
+        
+        for i,j in self.grid_dict.items():
+            y = i % self.grid_y +0.1
+            x = (i-y) / self.grid_x +0.1
+            for j in range(len(j)):                
+                plt.scatter(x, y)
+                x = x + 0.1
+        fig.canvas.draw()
 
 if __name__ == "__main__":
     print("Training")
@@ -68,7 +82,13 @@ if __name__ == "__main__":
     world.initialize_grid()
     world.populate_world()
     episodes = 1000
-    episode_length = 25
+    episode_length = 10
+
+    fig = plt.gcf()
+    fig = plt.figure()
+    fig.show()
+    fig.canvas.draw()
+        
     for j in range(episodes):
         world.initialize_grid()
         world.populate_world()
@@ -77,3 +97,6 @@ if __name__ == "__main__":
             print("epi - " + str(j))
             print("step - " + str(i))
             world.update_step()
+        world.view_grid(j)
+        time.sleep(2)
+        
