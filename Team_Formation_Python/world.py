@@ -88,6 +88,7 @@ if __name__ == "__main__":
     fig = plt.figure()
     fig.show()
     fig.canvas.draw()
+    fig.clf()
         
     for j in range(episodes):
         world.initialize_grid()
@@ -99,4 +100,5 @@ if __name__ == "__main__":
             world.update_step()
         world.view_grid(j)
         time.sleep(2)
+        fig.clf()
         
