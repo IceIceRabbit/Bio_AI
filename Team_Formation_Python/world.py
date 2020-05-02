@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 
 class world:
     def __init__(self):
+        self.best_state = -1
+        self.best_r = -1
         self.grid_x = 7
         self.grid_y = 7
         self.grid_length = self.grid_x * self.grid_y
@@ -56,15 +58,17 @@ class world:
             #     self.step(self.grid_dict,i)
 
 
-    def check_reward(self):
+    def check_reward(self,ep):
         r = 0
         for i in self.grid_dict.values():
             if len(i) == self.team_size:
-                r = r+1
-        if r >= self.no_of_teams/2 -1:
-            return True
-        else:
-            return False
+                (unique, counts) = np.unique(i, return_counts=True)
+                frequencies = np.asarray((unique, counts)).T
+                if len(frequencies) == 1:
+                    r = r+1
+        if r > self.best_r:
+            self.best_r = r
+            self.best_state = ep
 
 
     def view_grid(self,epi):
@@ -96,6 +100,7 @@ if __name__ == "__main__":
     world.populate_world()
     episodes = 100
     episode_length = 100
+    best_fig = None
 
     fig = plt.gcf()
     fig = plt.figure()
@@ -111,14 +116,15 @@ if __name__ == "__main__":
             print("step - " + str(i))
             world.update_step()
             world.view_grid(i)
-            if world.check_reward():
-                filename = 'best_plot' + str(i) + '.png'
-                fig = plt.gcf()
-                plt.savefig(filename)
-                print()
-                print("One of the best!")
-                print()
-                time.sleep(3)
-        time.sleep(5)
-        fig.clf()
+            world.check_reward(i)
+            if i == world.best_state:
+                best_fig = fig
+       filename = 'best_plot' + str(j) + '.png'
+       fig = plt.gcf()
+       best_fig.savefig(filename)
+       print()
+       print("Best Run!")
+       print()
+       time.sleep(5)
+       fig.clf()
         
