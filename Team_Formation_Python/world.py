@@ -10,12 +10,12 @@ class world:
     def __init__(self):
         self.best_state = -1
         self.best_r = -1
-        self.grid_x = 7
-        self.grid_y = 7
+        self.grid_x = 4
+        self.grid_y = 4
         self.grid_length = self.grid_x * self.grid_y
         self.grid_dict = {}
         self.team_size = 3
-        self.no_of_teams = 10
+        self.no_of_teams = 3
         self.pop = self.team_size * self.no_of_teams
         self.agent_states = [-1 for x in range(self.pop)]
         self.actions = {'up': (-1 * self.grid_x), 'left': (-1), 'right': (+1), 'down': (+1 * self.grid_x) ,'stay':(0)}
@@ -58,7 +58,7 @@ class world:
             #     self.step(self.grid_dict,i)
 
 
-    def check_reward(self,ep):
+    def check_reward(self,ep,j):
         r = 0
         for i in self.grid_dict.values():
             if len(i) == self.team_size:
@@ -66,10 +66,19 @@ class world:
                 frequencies = np.asarray((unique, counts)).T
                 if len(frequencies) == 1:
                     r = r+1
-        if r > self.best_r:
+        print(r)
+        print(self.best_r)
+        if r > self.best_r and r>=1:
             self.best_r = r
             self.best_state = ep
-
+            filename = 'best_plot' + str(ep) + 'step' + str(j)+ '.png'
+            fig = plt.gcf()
+            fig.savefig('States/' + 'Ep' + str(j) + '/' + filename)
+            print()
+            print("Best Run!")
+            print()
+            time.sleep(5)
+            fig.clf()
 
     def view_grid(self,epi):
         
@@ -86,8 +95,10 @@ class world:
         for i,j in self.grid_dict.items():
             y = i % self.grid_y +0.1
             x = (i-y) / self.grid_x +0.1
-            for j in range(len(j)):                
-                plt.scatter(x, y)
+            for k in j:
+                # print(k)
+                # print(color[k])
+                plt.scatter(x, y,c = color[k])
                 x = x + 0.1
         fig.canvas.draw()
         
@@ -98,7 +109,7 @@ if __name__ == "__main__":
     world = world()
     world.initialize_grid()
     world.populate_world()
-    episodes = 100
+    episodes = 10
     episode_length = 100
     best_fig = None
 
@@ -108,6 +119,8 @@ if __name__ == "__main__":
     fig.canvas.draw()
         
     for j in range(episodes):
+        world.best_r = -1
+        world.best_state = -1
         world.initialize_grid()
         world.populate_world()
         for i in range(episode_length):
@@ -116,15 +129,5 @@ if __name__ == "__main__":
             print("step - " + str(i))
             world.update_step()
             world.view_grid(i)
-            world.check_reward(i)
-            if i == world.best_state:
-                best_fig = fig
-       filename = 'best_plot' + str(j) + '.png'
-       fig = plt.gcf()
-       best_fig.savefig(filename)
-       print()
-       print("Best Run!")
-       print()
-       time.sleep(5)
-       fig.clf()
-        
+            world.check_reward(i,j)
+

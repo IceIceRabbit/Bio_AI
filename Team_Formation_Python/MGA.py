@@ -36,7 +36,7 @@ class MGA:
         for j in range(len(tot)):
             i = tot[j]
             fit.append(self.grid_reward[state + self.actions[i]])
-            print(fit)
+            # print(fit)
         self.fitz = fit
         
 
